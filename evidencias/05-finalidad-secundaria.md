@@ -120,7 +120,7 @@ Consultar únicamente la tabla productiva `clientes` devuelve el registro activo
 
 Cuando un titular ejerce su derecho de rectificación al notificar que su información es inexacta o desactualizada, se ejecuta la actualización únicamente sobre el dato específico:
 
-```sql
+
 -- Actualización del correo electrónico del titular
 UPDATE clientes 
 SET correo = 'nuevo-correo@example.com' 
@@ -131,3 +131,44 @@ SELECT id, nombre, correo
 FROM clientes 
 WHERE id = 1;
 
+## Análisis e Implicaciones Técnicas
+1. ¿Cómo podría comprobarse que el cambio fue autorizado?
+Ticket de Solicitud de Derecho ARCO: Existencia de un folio o ticket formal en el sistema de atención/cumplimiento que valide la identidad del titular antes de proceder con el cambio.   
+LABORATORIO 03 Alumnos (Privacidad Cumplimiento y Gobierno de Datos).docx
+
+Validación de Identidad / OTP: Verificación previa mediante token enviado al canal verificado o confirmación por firma digital/documento oficial de identificación.
+
+Correlación de Registros: Vinculación directa entre el ID del ticket de rectificación autorizado por el área de privacidad y el ID de la transacción ejecutada en la base de datos.   
+LABORATORIO 03 Alumnos (Privacidad Cumplimiento y Gobierno de Datos).docx
+
+2. ¿Debería registrarse quién realizó el cambio?
+Sí, de manera obligatoria. Todo cambio sobre datos personales debe quedar registrado en bitácoras de auditoría (audit logs), almacenando:   
+LABORATORIO 03 Alumnos (Privacidad Cumplimiento y Gobierno de Datos).docx
++ 1
+
+Identidad del usuario: Cuenta del DBA, servicio o usuario de la aplicación que ejecutó la instrucción UPDATE.   
+LABORATORIO 03 Alumnos (Privacidad Cumplimiento y Gobierno de Datos).docx
+
+Origen de la conexión: Dirección IP y nombre de la aplicación cliente desde la cual se realizó la modificación.
+
+Marca de tiempo (Timestamp): Fecha y hora exacta de la transacción.
+
+Histórico de valores (Delta): El valor anterior (correo_anterior) y el nuevo valor asignado (correo_nuevo).
+
+Técnicamente, esto se implementa en PostgreSQL mediante Triggers de auditoría o extensiones especializadas como pg_audit.   
+LABORATORIO 03 Alumnos (Privacidad Cumplimiento y Gobierno de Datos).docx
+
+3. ¿Por qué la trazabilidad será importante?
+La trazabilidad (capacidad de rastrear el origen, motivo y autoría de cualquier modificación sobre la información) es fundamental por los siguientes motivos:   
+LABORATORIO 03 Alumnos (Privacidad Cumplimiento y Gobierno de Datos).docx
+
+Deslinde de Responsabilidades: Permite identificar si la modificación fue producto de una solicitud legítima del titular, una equivocación operativa de un usuario o un acceso malicioso/no autorizado.   
+LABORATORIO 03 Alumnos (Privacidad Cumplimiento y Gobierno de Datos).docx
+
+Cumplimiento Normativo y Auditoría: Permite demostrar ante auditores externos o autoridades de protección de datos (como el INAI) que la rectificación respondió a una solicitud ARCO legítima y autorizada.   
+LABORATORIO 03 Alumnos (Privacidad Cumplimiento y Gobierno de Datos).docx
+
+Integridad y Reversión de Datos: En caso de error o fraude, contar con la bitácora histórica facilita la recuperación exacta del estado del dato anterior sin afectar otros registros.
+
+Preparación para Controles de Auditoría Avanzados: La trazabilidad sienta las bases técnicas para los mecanismos de monitoreo, detección de anomalías y auditoría de bases de datos que se profundizarán en la Unidad III.   
+LABORATORIO 03 Alumnos (Privacidad Cumplimiento y Gobierno de Datos).docx
